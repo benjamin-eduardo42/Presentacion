@@ -1,0 +1,135 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC Bayern Munich</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        header {
+            background-color: #dc052d;
+            color: white;
+            text-align: center;
+            padding: 2em;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .section {
+            padding: 2em;
+            text-align: center;
+        }
+        .section h2 {
+            color: #dc052d;
+            font-size: 1.8em;
+        }
+        .image-gallery {
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        .image-gallery img {
+            max-width: 300px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        footer {
+            background-color: #dc052d;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>FC Bayern Munich</h1>
+        <p>Welcome to the official fan page of FC Bayern Munich!</p>
+    </header>
+
+    <div class="section" id="team">
+        <h2>Our Team</h2>
+        <p>Meet the stars of FC Bayern Munich, showcasing their talent and passion on the pitch.</p>
+        <div class="image-gallery">
+            <img src="https://via.placeholder.com/300x200?text=Bayern+Team+1" alt="Bayern Team 1">
+            <img src="https://via.placeholder.com/300x200?text=Bayern+Team+2" alt="Bayern Team 2">
+            <img src="https://via.placeholder.com/300x200?text=Bayern+Team+3" alt="Bayern Team 3">
+        </div>
+    </div>
+
+    <div class="section" id="stadium">
+        <h2>Allianz Arena</h2>
+        <p>Explore the iconic Allianz Arena, the home of FC Bayern Munich.</p>
+        <div class="image-gallery">
+            <img src="https://via.placeholder.com/300x200?text=Allianz+Arena+1" alt="Allianz Arena 1">
+            <img src="https://via.placeholder.com/300x200?text=Allianz+Arena+2" alt="Allianz Arena 2">
+            <img src="https://via.placeholder.com/300x200?text=Allianz+Arena+3" alt="Allianz Arena 3">
+        </div>
+    </div>
+
+    <div class="section" id="trophies">
+        <h2>Our Trophies</h2>
+        <p>Celebrate the victories and achievements of FC Bayern Munich.</p>
+        <div class="image-gallery">
+            <img src="https://via.placeholder.com/300x200?text=Trophy+1" alt="Trophy 1">
+            <img src="https://via.placeholder.com/300x200?text=Trophy+2" alt="Trophy 2">
+            <img src="https://via.placeholder.com/300x200?text=Trophy+3" alt="Trophy 3">
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 FC Bayern Munich Fan Page. All rights reserved.</p>
+    </footer>
+</body>
+</html>
